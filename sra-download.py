@@ -38,11 +38,11 @@ for seq in acclist:
     subprocess.run(["rm", "sra-download-out/" + seq + ".fastq"])
 
 # Optional, compilation into bamfile
-# write samfiles.txt
-# with open("sra-download-out/samfiles.txt", "w") as samfiles:
-#     for seq in acclist:
-#         samfiles.write("sra-download-out/" + seq + ".sam\n")
-# 
-# subprocess.check_output(["samtools", "mpileup", "-BQ0", "-d10000", "-f", args.reference, "-q", "40", "-b", "sra-download-out/samfiles.txt"])
+if args.pileup:
+    with open("sra-download-out/samfiles.txt", "w") as samfiles:
+        for seq in acclist:
+            samfiles.write("sra-download-out/" + seq + ".sam\n")
 
-# Cleanup
+    subprocess.check_output(["samtools", "mpileup", "-BQ0", "-d10000", "-f", args.reference, "-q", "40", "-b", "sra-download-out/samfiles.txt"])
+
+    # Cleanup
