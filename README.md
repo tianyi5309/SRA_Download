@@ -24,4 +24,4 @@ acclist: List of SRA sequences to be downloaded
 
 --pileup: Combines bam output into pileup file. Requires samtools
 
-Output will be in the sra-download-out folder
+Output will be sorted .bam files, found in the sra-download-out folder. If --pileup is used, output will be a single compiled.pl pileup file.

@@ -34,16 +34,20 @@ for seq in acclist:
         subprocess.call(["bwa", "mem", args.reference, "sra-download-out/" + seq + ".fastq"], stdout=outfile)
     print("Saved as " + seq + ".sam")
 
+
+# Sort samfiles
+for seq in acclist:
+    subprocess.check_output(["samtools", "sort", "-o", "sra-download-out/" + seq + "_sorted.bam", "sra-download-out/" + seq + ".sam"])
+
 # Cleanup
-print("Cleaning up .fastq files")
+print("Cleaning up")
 for seq in acclist:
     subprocess.run(["rm", "sra-download-out/" + seq + ".fastq"])
+    subprocess.run(["rm", "sra-download-out/" + seq + ".sam"])
+
 
 # Optional, compilation into pileup
 if args.pileup:
-    # Sort and index
-    for seq in acclist:
-        subprocess.check_output(["samtools", "sort", "-o", "sra-download-out/" + seq + "_sorted.bam", "sra-download-out/" + seq + ".sam"])
     with open("sra-download-out/samfiles.txt", "w") as samfiles:
         for seq in acclist:
             samfiles.write("sra-download-out/" + seq + "_sorted.bam\n")
@@ -52,7 +56,6 @@ if args.pileup:
         subprocess.run(["samtools", "mpileup", "-BQ0", "-d10000", "-f", args.reference, "-q", "40", "-b", "sra-download-out/samfiles.txt"], stdout=outfile)
 
     # Cleanup
+    print("Cleaning up")
     for seq in acclist:
-        print("Cleaning up")
-        subprocess.run(["rm", "sra-download-out/" + seq + ".sam"])
         subprocess.run(["rm", "sra-download-out/" + seq + "_sorted.bam"])
