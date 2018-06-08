@@ -27,6 +27,7 @@ except subprocess.CalledProcessError:
     print("Directory already created.")
 
 for seq in acclist:
+    subprocess.check_output(["prefetch", seq])
     subprocess.check_output(["fastq-dump", seq, "--outdir", "sra-download-out"])
 
     with open("sra-download-out/" + seq +".sam", "w") as outfile:
@@ -34,15 +35,24 @@ for seq in acclist:
     print("Saved as " + seq + ".sam")
 
 # Cleanup
+print("Cleaning up .fastq files")
 for seq in acclist:
     subprocess.run(["rm", "sra-download-out/" + seq + ".fastq"])
 
-# Optional, compilation into bamfile
+# Optional, compilation into pileup
 if args.pileup:
+    # Sort and index
+    for seq in acclist:
+        subprocess.check_output(["samtools", "sort", "-o", "sra-download-out/" + seq + "_sorted.bam", "sra-download-out/" + seq + ".sam"])
     with open("sra-download-out/samfiles.txt", "w") as samfiles:
         for seq in acclist:
-            samfiles.write("sra-download-out/" + seq + ".sam\n")
-
-    subprocess.check_output(["samtools", "mpileup", "-BQ0", "-d10000", "-f", args.reference, "-q", "40", "-b", "sra-download-out/samfiles.txt"])
+            samfiles.write("sra-download-out/" + seq + "_sorted.bam\n")
+    
+    with open("sra-download-out/compiled.pl", "w") as outfile:
+        subprocess.run(["samtools", "mpileup", "-BQ0", "-d10000", "-f", args.reference, "-q", "40", "-b", "sra-download-out/samfiles.txt"], stdout=outfile)
 
     # Cleanup
+    for seq in acclist:
+        print("Cleaning up")
+        subprocess.run(["rm", "sra-download-out/" + seq + ".sam"])
+        subprocess.run(["rm", "sra-download-out/" + seq + "_sorted.bam"])
