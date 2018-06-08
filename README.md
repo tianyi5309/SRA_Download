@@ -19,7 +19,9 @@ Index the reference genome you intend to use with ```bwa index hg18.fa```
 sra-download.py [-h] [--pileup] reference acclist
 
 reference: Reference genome file, must be indexed already
+
 acclist: List of SRA sequences to be downloaded
+
 --pileup: Combines bam output into pileup file. Requires samtools
 
 Output will be in the sra-download-out folder
