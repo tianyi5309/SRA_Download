@@ -16,7 +16,6 @@ args = parser.parse_args()
 # Parse acclist
 acclist_file = open(args.acclist, "r")
 acclist = acclist_file.read().strip().split()
-acclist.sort()
 
 print("Acclist: ", acclist)
 
