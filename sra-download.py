@@ -29,21 +29,17 @@ for seq in acclist:
     subprocess.check_output(["prefetch", seq])
     subprocess.check_output(["fastq-dump", seq, "--outdir", "sra-download-out"])
 
+    # Align
     with open("sra-download-out/" + seq +".sam", "w") as outfile:
         subprocess.call(["bwa", "mem", args.reference, "sra-download-out/" + seq + ".fastq"], stdout=outfile)
     print("Saved as " + seq + ".sam")
-
-
-# Sort samfiles
-for seq in acclist:
+    
+    # Sort samfile
     subprocess.check_output(["samtools", "sort", "-o", "sra-download-out/" + seq + "_sorted.bam", "sra-download-out/" + seq + ".sam"])
-
-# Cleanup
-print("Cleaning up")
-for seq in acclist:
+    
+    # Cleanup
     subprocess.run(["rm", "sra-download-out/" + seq + ".fastq"])
     subprocess.run(["rm", "sra-download-out/" + seq + ".sam"])
-
 
 # Optional, compilation into pileup
 if args.pileup:
